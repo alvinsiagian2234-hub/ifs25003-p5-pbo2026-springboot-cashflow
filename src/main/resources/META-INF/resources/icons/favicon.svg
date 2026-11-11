@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cashflow">
+  <rect width="64" height="64" rx="12" fill="#2563EB"/>
+  <rect x="10.5" y="15" width="35.5" height="8.75" rx="4.25" fill="#BFDBFE"/>
+  <rect x="10.5" y="18.75" width="42.5" height="30.25" rx="5" fill="#FFFFFF"/>
+  <rect x="37.5" y="29" width="18.25" height="9.75" rx="3.5" fill="#1D4ED8"/>
+  <circle cx="44" cy="33.9" r="2.1" fill="#FFFFFF"/>
+  <path d="M18.75 37.5l4.4-6.25 4.4 6.25h-2.75v6.75h-3.3V37.5z" fill="#16A34A"/>
+  <path d="M29 37.5l4.4 6.25 4.4-6.25h-2.75v-6.75h-3.3v6.75z" fill="#DC2626"/>
+</svg>
