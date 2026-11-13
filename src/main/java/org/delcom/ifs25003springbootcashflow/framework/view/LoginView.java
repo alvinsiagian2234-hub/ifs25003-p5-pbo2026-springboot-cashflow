@@ -35,6 +35,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.userRepository = userRepository;
 
         setSizeFull();
+        getElement().setAttribute("role", "main");
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
         getStyle().set("background", "#F3F4F6");
