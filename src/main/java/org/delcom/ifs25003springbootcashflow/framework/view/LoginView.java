@@ -4,8 +4,8 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -35,7 +35,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.userRepository = userRepository;
 
         setSizeFull();
-        getElement().setAttribute("role", "main");
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
         getStyle().set("background", "#F3F4F6");
@@ -108,7 +107,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         username.getStyle().set("margin", "0");
         password.getStyle().set("margin", "0");
 
-        Div card = new Div(form);
+        Main card = new Main(form);
         card.getStyle()
                 .set("width", "100%")
                 .set("max-width", "420px")
@@ -125,20 +124,20 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private void setInnerInputId(com.vaadin.flow.component.Component component, String id) {
         Runnable apply = () -> component.getElement().executeJs(
                 "const applyId = () => {" +
-                "  const input = this.inputElement || this.querySelector('input');" +
-                "  if (input) {" +
-                "    input.id = $0;" +
-                "    const label = this.querySelector('label');" +
-                "    if (label) label.setAttribute('for', $0);" +
-                "    return true;" +
-                "  }" +
-                "  return false;" +
-                "};" +
-                "if (!applyId()) {" +
-                "  if (this.updateComplete) { this.updateComplete.then(applyId); }" +
-                "  const obs = new MutationObserver(() => { if (applyId()) obs.disconnect(); });" +
-                "  obs.observe(this, { childList: true, subtree: true });" +
-                "}", id);
+                        "  const input = this.inputElement || this.querySelector('input');" +
+                        "  if (input) {" +
+                        "    input.id = $0;" +
+                        "    const label = this.querySelector('label');" +
+                        "    if (label) label.setAttribute('for', $0);" +
+                        "    return true;" +
+                        "  }" +
+                        "  return false;" +
+                        "};" +
+                        "if (!applyId()) {" +
+                        "  if (this.updateComplete) { this.updateComplete.then(applyId); }" +
+                        "  const obs = new MutationObserver(() => { if (applyId()) obs.disconnect(); });" +
+                        "  obs.observe(this, { childList: true, subtree: true });" +
+                        "}", id);
 
         apply.run();
         component.addAttachListener(event -> apply.run());
