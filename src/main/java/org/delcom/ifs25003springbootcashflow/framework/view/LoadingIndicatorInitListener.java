@@ -8,8 +8,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 /**
- * Konfigurasi indikator loading global, plus landmark awal di HTML agar
- * halaman tetap valid untuk audit aksesibilitas sebelum UI Vaadin selesai dirender.
+ * Konfigurasi indikator loading global, plus landmark dan tampilan awal di HTML
+ * agar halaman valid untuk audit aksesibilitas dan cepat terlihat sebelum UI Vaadin dirender.
  */
 @Component
 public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
@@ -18,7 +18,13 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
             "position:absolute;width:1px;height:1px;margin:-1px;padding:0;"
                     + "overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0";
 
-    /** Dijalankan langsung di HTML awal: tandai indikator koneksi begitu dibuat Vaadin. */
+    private static final String SPLASH_STYLE =
+            "position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;"
+                    + "justify-content:center;background:#F3F4F6;color:#1F2937;"
+                    + "font:600 1.25rem system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;"
+                    + "z-index:2147483000";
+
+    /** Dijalankan langsung di HTML awal: tandai indikator koneksi dan pengaman hapus tampilan awal. */
     private static final String EARLY_SCRIPT =
             "(function(){"
                     + "var mark=function(){"
@@ -28,9 +34,12 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
                     + "if(!mark()){"
                     + "var o=new MutationObserver(function(){if(mark()){o.disconnect();}});"
                     + "o.observe(document.documentElement,{childList:true,subtree:true});"
-                    + "}})();";
+                    + "}"
+                    + "setTimeout(function(){var m=document.getElementById('initial-landmark');"
+                    + "if(m){m.remove();}},15000);"
+                    + "})();";
 
-    /** Dijalankan setelah UI Vaadin siap: placeholder dihapus karena view punya landmark sendiri. */
+    /** Dijalankan setelah UI Vaadin siap: tampilan awal dihapus karena view punya landmark sendiri. */
     private static final String UI_READY_SCRIPT =
             "var p=document.getElementById('initial-landmark');"
                     + "if(p){p.remove();}"
@@ -45,6 +54,10 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
             main.appendElement("h1")
                     .attr("style", HIDDEN_STYLE)
                     .text("Cashflow - Catatan Keuangan Pribadi");
+            main.appendElement("div")
+                    .attr("style", SPLASH_STYLE)
+                    .appendElement("span")
+                    .text("Memuat Cashflow...");
             body.prependElement("script").appendChild(new DataNode(EARLY_SCRIPT));
         });
 
