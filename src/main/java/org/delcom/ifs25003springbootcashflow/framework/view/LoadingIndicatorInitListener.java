@@ -19,7 +19,14 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
             conf.setFirstDelay(150);
             conf.setSecondDelay(600);
             conf.setThirdDelay(1500);
+
+            // Tandai indikator koneksi Vaadin sebagai live region agar tidak
+            // dianggap konten di luar landmark oleh Axe (aturan "region").
+            uiEvent.getUI().getPage().executeJs(
+                    "const mark = () => document.querySelectorAll('vaadin-connection-indicator')" +
+                            ".forEach(el => { el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); });" +
+                            "mark();" +
+                            "new MutationObserver(mark).observe(document.body, { childList: true });");
         });
     }
 }
-
