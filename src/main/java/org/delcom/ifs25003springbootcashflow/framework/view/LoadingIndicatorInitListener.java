@@ -8,8 +8,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 /**
- * Konfigurasi indikator loading global, plus landmark dan tampilan awal di HTML
- * agar halaman valid untuk audit aksesibilitas dan cepat terlihat sebelum UI Vaadin dirender.
+ * Konfigurasi indikator loading global, plus landmark awal di HTML agar
+ * halaman tetap valid untuk audit aksesibilitas sebelum UI Vaadin selesai dirender.
  */
 @Component
 public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
@@ -18,13 +18,7 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
             "position:absolute;width:1px;height:1px;margin:-1px;padding:0;"
                     + "overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0";
 
-    private static final String SPLASH_STYLE =
-            "position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;"
-                    + "justify-content:center;background:#F3F4F6;color:#1F2937;"
-                    + "font:600 1.25rem system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;"
-                    + "z-index:2147483000";
-
-    /** Dijalankan langsung di HTML awal: tandai indikator koneksi dan pengaman hapus tampilan awal. */
+    /** Dijalankan langsung di HTML awal: tandai indikator koneksi, plus pengaman hapus placeholder. */
     private static final String EARLY_SCRIPT =
             "(function(){"
                     + "var mark=function(){"
@@ -39,12 +33,23 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
                     + "if(m){m.remove();}},15000);"
                     + "})();";
 
-    /** Dijalankan setelah UI Vaadin siap: tampilan awal dihapus karena view punya landmark sendiri. */
+    /**
+     * Dijalankan setelah UI Vaadin siap: placeholder baru dihapus ketika H1 milik halaman asli
+     * sudah ada, sehingga tidak pernah ada momen tanpa main dan H1.
+     */
     private static final String UI_READY_SCRIPT =
-            "var p=document.getElementById('initial-landmark');"
-                    + "if(p){p.remove();}"
-                    + "document.querySelectorAll('vaadin-connection-indicator').forEach(function(e){"
-                    + "e.setAttribute('role','status');e.setAttribute('aria-live','polite');});";
+            "(function(){"
+                    + "var mark=function(){document.querySelectorAll('vaadin-connection-indicator')"
+                    + ".forEach(function(e){e.setAttribute('role','status');e.setAttribute('aria-live','polite');});};"
+                    + "var tryRemove=function(){"
+                    + "var p=document.getElementById('initial-landmark');"
+                    + "if(!p){return true;}"
+                    + "var h=document.querySelectorAll('h1');"
+                    + "for(var i=0;i<h.length;i++){if(!p.contains(h[i])){p.remove();return true;}}"
+                    + "return false;};"
+                    + "mark();"
+                    + "if(!tryRemove()){var t=setInterval(function(){if(tryRemove()){clearInterval(t);}},50);}"
+                    + "})();";
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
@@ -54,10 +59,6 @@ public class LoadingIndicatorInitListener implements VaadinServiceInitListener {
             main.appendElement("h1")
                     .attr("style", HIDDEN_STYLE)
                     .text("Cashflow - Catatan Keuangan Pribadi");
-            main.appendElement("div")
-                    .attr("style", SPLASH_STYLE)
-                    .appendElement("span")
-                    .text("Memuat Cashflow...");
             body.prependElement("script").appendChild(new DataNode(EARLY_SCRIPT));
         });
 
